@@ -1,0 +1,10 @@
+.boolean-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.boolean-filter__label {
+  font: 400 12px / 1 Roboto, 'Helvetica Neue', sans-serif;
+  opacity: 0.7;
+}

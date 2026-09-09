@@ -1,6 +1,12 @@
+<app-filter-bar
+  class="security-filter"
+  [fields]="filterFields"
+  (valueChange)="onFilterChange($event)"
+/>
+
 <filterable-table
   class="security-list"
-  [dataSource]="securities$ | async"
+  [dataSource]="securities()"
   [isLoading]="loadingSecurities$ | async"
 >
   <ng-container matColumnDef="name">
@@ -27,3 +33,11 @@
     <td class="mat-cell" colspan="3"><i>No data</i></td>
   </tr>
 </filterable-table>
+
+<mat-paginator
+  [length]="total()"
+  [pageIndex]="pageIndex()"
+  [pageSize]="pageSize()"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="onPage($event)"
+/>

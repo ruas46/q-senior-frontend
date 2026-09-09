@@ -1,0 +1,33 @@
+<div class="filter-bar">
+  @for (field of fields(); track field.key) {
+    @switch (field.type) {
+      @case (FilterControlType.Text) {
+        <app-text-filter
+          [config]="field"
+          [value]="$any(draft()[field.key])"
+          (valueChange)="patch(field.key, $event)"
+        />
+      }
+      @case (FilterControlType.MultiSelect) {
+        <app-multi-select-filter
+          [config]="field"
+          [value]="$any(draft()[field.key])"
+          (valueChange)="patch(field.key, $event)"
+        />
+      }
+      @case (FilterControlType.Boolean) {
+        <app-boolean-filter
+          [config]="field"
+          [value]="$any(draft()[field.key])"
+          (valueChange)="patch(field.key, $event)"
+        />
+      }
+    }
+  }
+
+  @if (activeCount() > 0) {
+    <button mat-button type="button" (click)="clear()">
+      Clear{{ activeCount() > 1 ? ' all' : '' }}
+    </button>
+  }
+</div>

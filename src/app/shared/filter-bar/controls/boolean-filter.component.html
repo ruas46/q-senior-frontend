@@ -1,0 +1,16 @@
+<div class="boolean-filter">
+  <span class="boolean-filter__label">{{ config().label }}</span>
+  <mat-button-toggle-group
+    hideSingleSelectionIndicator
+    [value]="value()"
+    (change)="valueChange.emit($event.value)"
+  >
+    <mat-button-toggle [value]="undefined">Any</mat-button-toggle>
+    <mat-button-toggle [value]="true">
+      {{ config().trueLabel ?? 'Yes' }}
+    </mat-button-toggle>
+    <mat-button-toggle [value]="false">
+      {{ config().falseLabel ?? 'No' }}
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</div>

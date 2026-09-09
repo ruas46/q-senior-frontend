@@ -9,15 +9,31 @@ import { SecuritiesFilter } from '../models/securities-filter';
 })
 export class SecurityService {
   /**
-   * Get Securities server request mock
+   * Get Securities server request mock. `skip`/`limit` page the result.
    * */
   getSecurities(securityFilter?: SecuritiesFilter): Observable<Security[]> {
-    const filteredSecurities = this._filterSecurities(securityFilter).slice(
-      securityFilter?.skip ?? 0,
-      securityFilter?.limit ?? 100
-    );
+    const matches = this._filterSecurities(securityFilter);
+    const skip = securityFilter?.skip ?? 0;
+    const limit = securityFilter?.limit ?? matches.length;
 
-    return of(filteredSecurities).pipe(delay(1000));
+    return of(matches.slice(skip, skip + limit)).pipe(delay(1000));
+  }
+
+  /** Total matches for a filter, ignoring paging - backs the paginator. */
+  getSecuritiesCount(securityFilter?: SecuritiesFilter): Observable<number> {
+    return of(this._filterSecurities(securityFilter).length).pipe(delay(1000));
+  }
+
+  /** Distinct security types present in the data (filter bar options). */
+  getSecurityTypes(): Observable<string[]> {
+    return of([...new Set(SECURITIES.map((s) => s.type))].sort()).pipe(delay(300));
+  }
+
+  /** Distinct currencies present in the data (filter bar options). */
+  getCurrencies(): Observable<string[]> {
+    return of([...new Set(SECURITIES.map((s) => s.currency))].sort()).pipe(
+      delay(300),
+    );
   }
 
   private _filterSecurities(
@@ -27,7 +43,8 @@ export class SecurityService {
 
     return SECURITIES.filter(
       (s) =>
-        (!securityFilter.name || s.name.includes(securityFilter.name)) &&
+        (!securityFilter.name ||
+          s.name.toLowerCase().includes(securityFilter.name.toLowerCase())) &&
         (!securityFilter.types ||
           securityFilter.types.some((type) => s.type === type)) &&
         (!securityFilter.currencies ||
