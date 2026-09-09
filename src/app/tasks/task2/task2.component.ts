@@ -1,8 +1,7 @@
-import {Component, signal, TrackByFunction} from '@angular/core';
+import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
 import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatButton} from '@angular/material/button';
-import {SelectionModel} from '@angular/cdk/collections';
 
 interface Row {
   id: number;
@@ -25,22 +24,44 @@ function createRows(): Row[] {
   standalone: true,
   templateUrl: './task2.component.html',
   styleUrls: ['./task2.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Task2Component {
-  rows = signal<Row[]>(createRows())
+  readonly rows = signal<Row[]>(createRows());
 
-  selectionModel = new SelectionModel<Row>(true, undefined, undefined, (o1, o2) => o1.id === o2.id)
-  trackBy: TrackByFunction<Row> | undefined = (index, item) => item.id;
+  // Using signal and ids check > Angular re-render only when it changes
+  private readonly _selectedIds = signal<ReadonlySet<number>>(new Set<number>());
 
-  recreateData() {
-    this.rows.set(createRows())
+  isSelected(id: number): boolean {
+    return this._selectedIds().has(id);
   }
 
-  selectAll() {
-    this.selectionModel.select(...this.rows())
+  trackById(_index: number, row: Row): number {
+    return row.id;
   }
 
-  deselectAll() {
-    this.selectionModel.deselect(...this.rows())
+  toggle(id: number): void {
+    this._selectedIds.update((current) => {
+      const next = new Set(current);
+      // Set.delete returns false when the id was not present > select it
+      if (!next.delete(id)) {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  selectAll(): void {
+    // One O(n) pass, one signal write, one change-detection cycle
+    this._selectedIds.set(new Set(this.rows().map((row) => row.id)));
+  }
+
+  deselectAll(): void {
+    this._selectedIds.set(new Set<number>());
+  }
+
+  recreateData(): void {
+    // Row identities change, ids do not > the selection stays valid as-is
+    this.rows.set(createRows());
   }
 }

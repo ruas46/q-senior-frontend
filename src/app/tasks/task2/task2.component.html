@@ -4,10 +4,10 @@
   <button mat-button (click)="recreateData()">Recreate data</button>
 </div>
 <cdk-virtual-scroll-viewport itemSize="40">
-  <div class="row" *cdkVirtualFor="let row of rows(); trackBy: trackBy;">
+  <div class="row" *cdkVirtualFor="let row of rows(); trackBy: trackById">
     <mat-checkbox
-      [checked]="selectionModel.isSelected(row)"
-      (change)="selectionModel.toggle(row)">
+      [checked]="isSelected(row.id)"
+      (change)="toggle(row.id)">
     </mat-checkbox>
     <span>{{ row.title }}</span>
   </div>
