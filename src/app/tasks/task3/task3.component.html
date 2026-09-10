@@ -1,1 +1,134 @@
-<img src="monet.png" height="auto" width="100%"/>
+<article class="dashboard">
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <header class="hero">
+    <figure class="artwork">
+      <img [src]="asset.imageUrl" [alt]="asset.name" />
+    </figure>
+
+    <div class="identity">
+      <p class="eyebrow">Collectible Asset · Fine Art</p>
+      <h1 class="title">{{ asset.name }}</h1>
+      <p class="byline">
+        {{ asset.attribution }} · {{ asset.medium }} · {{ asset.year }}
+      </p>
+
+      <div class="valuation">
+        <span class="valuation__label">Current estimated value</span>
+        <span class="valuation__amount">
+          {{ asset.currentValue | currency: 'EUR' : 'symbol' : '1.0-0' }}
+        </span>
+        <span class="valuation__meta">
+          <span class="tag tag--up">
+            ▲ {{ asset.totalReturn }} since acquisition
+          </span>
+          Appraised {{ asset.appraisalDate | date: 'MMMM y' }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Asset Details ──────────────────────────────────────── -->
+  <section class="panel">
+    <h2 class="panel__title">Asset Details</h2>
+
+    <dl class="facts">
+      <div class="fact">
+        <dt>Acquisition</dt>
+        <dd>
+          {{ asset.acquisitionDate | date: 'd MMM y' }}
+          <span class="fact__sub">
+            for {{ asset.acquisitionCost | currency: 'EUR' : 'symbol' : '1.0-0' }}
+          </span>
+        </dd>
+      </div>
+
+      @for (fact of asset.keyFacts; track fact.label) {
+        <div class="fact">
+          <dt>{{ fact.label }}</dt>
+          <dd>{{ fact.value }}</dd>
+        </div>
+      }
+
+      <div class="fact fact--wide">
+        <dt>Condition Report</dt>
+        <dd>
+          <span class="badge">{{ asset.condition }}</span>
+          <span class="fact__sub">{{ asset.conditionNote }}</span>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="provenance">
+      <h3 class="subhead">Provenance</h3>
+      <ol class="provenance__list">
+        @for (entry of asset.provenance; track entry) {
+          <li>{{ entry }}</li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── Performance Analytics ──────────────────────────────── -->
+  <section class="panel">
+    <h2 class="panel__title">Performance Analytics</h2>
+
+    <div class="kpis">
+      <div class="kpi">
+        <span class="kpi__label">Current value</span>
+        <span class="kpi__value">
+          {{ asset.currentValue | currency: 'EUR' : 'symbol' : '1.0-0' }}
+        </span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__label">Total return</span>
+        <span class="kpi__value kpi__value--up">+{{ asset.totalReturn }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__label">Annualised</span>
+        <span class="kpi__value kpi__value--up">+{{ asset.annualisedReturn }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__label">Holding period</span>
+        <span class="kpi__value">{{ asset.holdingPeriod }}</span>
+      </div>
+    </div>
+
+    <figure class="chart-figure">
+      <figcaption>Estimated value over time</figcaption>
+      <div class="chart-box">
+        <canvas baseChart type="line" [data]="chartData" [options]="chartOptions"></canvas>
+      </div>
+    </figure>
+  </section>
+
+  <!-- ── Transaction History ────────────────────────────────── -->
+  <section class="panel">
+    <h2 class="panel__title">Transaction History</h2>
+    <p class="panel__hint">Recent auction results for comparable works.</p>
+
+    <div class="table-scroll">
+      <table class="comps">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Work</th>
+            <th scope="col" class="num">Sale Price</th>
+            <th scope="col">Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sale of asset.comparableSales; track sale.date) {
+            <tr>
+              <td>{{ sale.date | date: 'd MMM y' }}</td>
+              <td>{{ sale.title }}</td>
+              <td class="num">
+                {{ sale.price | currency: 'EUR' : 'symbol' : '1.0-0' }}
+              </td>
+              <td>{{ sale.location }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</article>
